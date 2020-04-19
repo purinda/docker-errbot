@@ -4,7 +4,6 @@ readonly ERRBIN="/app/venv/bin/errbot"
 readonly ERRRUN="/srv"
 readonly ERRUSER="err"
 
-
 for i in data plugins errbackends; do
   [[ ! -d "${ERRRUN}/${i}" ]] && mkdir "${ERRRUN}/${i}"
 done
@@ -17,10 +16,13 @@ if [[ -n ${WAIT} ]]; then
     sleep ${WAIT}
 fi
 
-chown -R ${ERRUSER} /srv
-
-echo source /app/venv/bin/activate >/srv/.bash_profile
+echo "source /app/venv/bin/activate" > /srv/.bash_profile
+source /app/venv/bin/activate
 
 ( for i in $(printenv | grep -v root | grep -v -E '\s+'); do  key=$(echo $i | sed 's/=.*//g'); val=$(echo $i | sed 's/.*=\(.*\)/\1/g'); echo "export $key='$val'"; done )>>/srv/.bash_profile
+
+# change directory
+cd "$ERRRUN"
+
 # copy default container image config file if not exist on volume but is specified
-su - ${ERRUSER} -c "${ERRBIN} $*"
+${ERRBIN}

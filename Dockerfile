@@ -1,11 +1,7 @@
-# Errbot - the pluggable chatbot
+FROM python:3.6-alpine
 
-FROM debian:stretch-slim
+MAINTAINER Purinda Gunasekara <purinda@gmail.com>
 
-MAINTAINER Rafael Römhild <rafael@roemhild.de>
-
-ENV ERR_USER err
-ENV DEBIAN_FRONTEND noninteractive
 ENV PATH /app/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 # Set default locale for the environment
@@ -13,52 +9,34 @@ ENV LC_ALL C.UTF-8
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US.UTF-8
 
-# Add err user and group
-RUN groupadd -r $ERR_USER \
-    && useradd -r \
-       -g $ERR_USER \
-       -d /srv \
-       -s /bin/bash \
-       $ERR_USER
 # Install packages and perform cleanup
-RUN apt-get update \
-  && apt-get -y install --no-install-recommends \
-         git \
-         qalc \
-         locales \
-         dnsutils \
-         libssl-dev \
-         build-essential \
-         python3-dnspython \
-         python3-dev \
-         python3-openssl \
-         python3-pip \
-         python3-cffi \
-         python3-pyasn1 \
-         python3-geoip \
-         python3-lxml \
-    && locale-gen C.UTF-8 \
-    && /usr/sbin/update-locale LANG=C.UTF-8 \
-    && echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen \
-    && locale-gen \
-    && pip3 install virtualenv \
-    && pip3 install -U setuptools \
-	&& rm -rf /var/lib/apt/lists/* \
-    && rm -rf /var/cache/apt/archives
+RUN apk add --no-cache \
+    linux-headers \
+    libc-dev \
+    libffi-dev \
+    libssh-dev \
+    bash \
+    gcc
+
+RUN pip3 install --upgrade pip
+RUN pip3 install virtualenv
 
 RUN mkdir /app
 
-COPY requirements.txt /app/requirements.txt
-
-RUN virtualenv /app/venv
-RUN . /app/venv/bin/activate; pip install --no-cache-dir -r /app/requirements.txt
+RUN virtualenv --python `which python3` /app/venv
+RUN source /app/venv/bin/activate;
+RUN pip3 install errbot
+RUN pip3 install errbot[slack]
 
 COPY config.py /app/config.py
 COPY run.sh /app/venv/bin/run.sh
 
-RUN mkdir /srv/data /srv/plugins /srv/errbackends && chown -R $ERR_USER: /srv /app
+RUN mkdir /srv/data /srv/plugins /srv/errbackends
 
 EXPOSE 3141 3142
 VOLUME ["/srv"]
 
+RUN /app/venv/bin/errbot --init
+
 ENTRYPOINT ["/app/venv/bin/run.sh"]
+CMD ["bash"]
