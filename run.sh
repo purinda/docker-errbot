@@ -19,7 +19,12 @@ fi
 echo "source /app/venv/bin/activate" > /srv/.bash_profile
 source /app/venv/bin/activate
 
-( for i in $(printenv | grep -v root | grep -v -E '\s+'); do  key=$(echo $i | sed 's/=.*//g'); val=$(echo $i | sed 's/.*=\(.*\)/\1/g'); echo "export $key='$val'"; done )>>/srv/.bash_profile
+(for i in $(printenv | grep -v root | grep -v -E '\s+');
+do
+  key=$(echo $i | sed 's/=.*//g');
+  val=$(echo $i | sed 's/.*=\(.*\)/\1/g');
+  echo "export $key='$val'";
+done) >> /srv/.bash_profile
 
 # change directory
 cd "$ERRRUN"

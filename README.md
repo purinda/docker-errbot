@@ -1,6 +1,8 @@
-# rroemhild/errbot
+# Errbot on Alpine Linux
 
-![Docker Build Status](https://img.shields.io/docker/build/rroemhild/errbot.svg) ![Docker Stars](https://img.shields.io/docker/stars/rroemhild/errbot.svg) ![Docker Pulls](https://img.shields.io/docker/pulls/rroemhild/errbot.svg)
+This image is influenced from rroemhild/errbot
+
+![Docker Build Status](https://img.shields.io/docker/build/purinda/errbot.svg) ![Docker Stars](https://img.shields.io/docker/stars/purinda/errbot.svg) ![Docker Pulls](https://img.shields.io/docker/pulls/purinda/errbot.svg)
 
 - [Introduction](#introduction)
 - [Quick Start](#quick-start)
@@ -20,26 +22,19 @@
 Dockerfile to build an [Errbot](http://errbot.io) (the pluggable chatbot) container image.
 
 Version: `latest`
-Docker: `rroemhild/errbot`
+Docker: `purinda/alpine-errbot`
 
 # Quick Start
 
 ```
 docker run -d \
     --name err \
-    -e BOT_USERNAME=err@xmmp.local \
-    -e BOT_PASSWORD=errbotpwd \
-    -e BOT_ADMINS=admin@xmpp.local \
-    -e CHATROOM_PRESENCE=err@conference.xmpp.local \
-    -e "TZ=Europe/Berlin" \
-    rroemhild/errbot
-```
-
-or try the docker compose example
-
-```bash
-wget https://raw.githubusercontent.com/rroemhild/docker-err/master/docker-compose.yml
-docker-compose up
+    -e BACKEND=Slack \
+    -e BOT_TOKEN=xoxb-Your-Slack-App-Token \
+    -e BOT_ADMINS=@admin-username \
+    -e BOT_ALT_PREFIXES=@bot-name-you-setup \
+    -e "TZ=Sydney/Australia" \
+    purinda/errbot
 ```
 
 # Configuration
@@ -104,19 +99,19 @@ If you pass arguments to Errbot you have to set the `-c /srv/config.py` argument
 ## Alternative config file
 
 ```bash
-docker run -it -v /tmp/errbot:/srv rroemhild/errbot -c /srv/production.py
+docker run -it -v /tmp/errbot:/srv purinda/errbot -c /srv/production.py
 ```
 
 ## Err Help
 
 ```bash
-$ docker run rroemhild/errbot -h
+$ docker run purinda/errbot -h
 ```
 
 ## Run with text debug backend
 
 ```bash
-docker run -it -v /tmp/errbot:/srv rroemhild/errbot -c /srv/config.py -T
+docker run -it -v /tmp/errbot:/srv purinda/errbot -c /srv/config.py -T
 ```
 
 # Exposed Ports
